@@ -48,3 +48,9 @@ class State:
     def setState(self,data):
         self.food=data[0]
         self.body=[SnakeBodyAttr(line) for line in data[1]]
+
+    def getHeadLen(self):
+        return abs(self.body[0].x1-self.body[0].x2) + abs(self.body[0].y1-self.body[0].y2)
+
+    def __lt__(self, other):
+        return self.getHeadLen() < other.getHeadLen()
