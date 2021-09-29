@@ -1,7 +1,7 @@
-
 import numpy as np
 from NetworkManager import NetworkManager
 from EnvironmentState import State, SnakeBodyAttr
+import time
 
 from heapq import *
 
@@ -50,9 +50,10 @@ class Controller:
         self.manhattan = lambda p1, p2: abs(p1[0]-p2[0]) + abs(p1[1]-p2[1])
         self.minSide = lambda p1, p2 : min(abs(p1[0]-p2[0]), abs(p1[1]-p2[1]))
         self.eucledean = lambda p1, p2: ((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)**0.5
-        self.collide = lambda p, p1, p2: self.manhattan(p,p1) + self.manhattan(p,p2) == self.manhattan(p1,p2) \
-             if  self.collinear(p, p1, p2) else False    
+        self.collide = lambda p, p1, p2: self.manhattan(p,p1) + self.manhattan(p,p2) == self.manhattan(p1,p2) 
         self.collison = lambda p, lines: any([self.collide(p, i[0], i[1]) for i in lines])
+
+        self.lineAttr = lambda l: np.array((l.x1, l.y1, l.x2, l.y2, l.x1_incr, l.y1_incr, l.x2_incr, l.y2_incr), dtype=np.short)
 
     
     
@@ -134,7 +135,7 @@ class Controller:
             if truth==True :
                 self.cmds = cmd_
                 return None
-            elif truth == 'continue' and len(cmd_)>20:
+            elif truth == 'continue' and len(cmd_)>5:
                 self.cmds = cmd_
                 return None
             elif truth == 'continue':
@@ -152,29 +153,18 @@ class Controller:
         self.cmds.append(NOOP)
             
 
-    
-    def lineAttr(self, l):
-        return (l.x1, l.y1, l.x2, l.y2, l.x1_incr, l.y1_incr, l.x2_incr, l.y2_incr)
+    def getNumpState(self)->tuple:
+        food = np.array(self.state.food, dtype=np.short)
+        body = [self.lineAttr(i) for i in self.state.body]
+        return (food, body)
 
-            
-
-        
 
     #Returns next command selected by the agent.
     def getNextCommand(self):
         #TODO Implement an Intelligent agent that plays the game
         # Hint You will require a collision detection function.
-        
-        if not self.cmds:
-            self.getCMD(self.state)
-            self.cmds = self.cmds[::-1]
-        return self.cmds.pop()
-
-        # print('Original State')
-        # print(self.state.food)
-        # print([self.lineAttr(l) for l in self.state.body])
-        # self.getCMD(self.state)
-        # return NOOP
+        return NOOP
+            
 
     def control(self):
         #Do not modify the order of operations.
